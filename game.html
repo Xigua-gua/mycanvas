@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>game1 </title>
+  </head>
+  <style media="screen">
+    canvas {
+      border: 1px black solid;
+    }
+  </style>
+  <body>
+    <canvas id="id-canvas" width="400" height="300"></canvas>
+<script>
+function imgFromPath(path) {
+  var img = new Image()
+  img.src = path
+  return img
+}
+class Paddle {
+  constructor(image, x, y, speed) {
+    this.image = imgFromPath(image)
+    this.x = x
+    this.y = y
+    this.speed = speed
+  }
+  moveLeft() {
+    this.x -= this.speed
+  }
+  moveRight() {
+    this.x += this.speed
+  }
+}
+var registerKeyEvent = function(key,e) {
+  window.addEventListener('keydown',(e) => {
+    if (e.key == 'a') {
+      leftDown = true
+    }else if (e.key == 'd') {
+      rightDown = true
+    }
+  })
+}
+var GuaGame = function() {
+  var g = {
+    actions: {},
+    keydowns: {},
+  }
+  var canvas = document.querySelector('#id-canvas')
+  var ctx = canvas.getContext('2d')
+  // events
+  window.addEventListener('keydown',(e) => {
+    g.keydowns[event.key] = true
+  })
+  window.addEventListener('keyup',(e) => {
+    g.keydowns[event.key] = false
+  })
+  g.registerAction = function(key, callback) {
+    g.actions[key] = callback
+  }
+  g.drawImage= function(paddle) {
+    ctx.drawImage(paddle.image,paddle.x,paddle.y)
+  }
+  setInterval(() => {
+    var actions = Object.keys(g.actions)
+    // console.log(actions);
+    for (var i = 0; i < actions.length; i++) {
+      var key = actions[i]
+      if (g.keydowns[key]) {
+        g.actions[key]()
+      }
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    g.draw()
+  }, 1000/30)
+  return g
+}
+// 入口
+var __main = function() {
+  var game = GuaGame()
+  var paddle = new Paddle('paddle.img',100,200,5)
+  console.log(paddle);
+  game.registerAction('a',() => {
+    paddle.moveLeft()
+  })
+  game.registerAction('d',() => {
+    paddle.moveRight()
+  })
+  game.draw = function() {
+    game.drawImage(paddle)
+  }
+}
+__main()
+</script>
+  </body>
+</html>
